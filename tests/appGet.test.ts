@@ -39,6 +39,46 @@ describe("GET /recommendations", () => {
 
         expect(status).toEqual(404);
     });
+
+    it("Buscando recomendações aleatorias /recommendatios/random, esperando return 200", async () => {
+        await prisma.recommendation.createMany({data:seed})
+        const result = await supertest(app).get(`/recommendations/random`);
+        const status = result.status;
+
+        expect(status).toEqual(200);
+    });
+
+    it("Buscando recomendações aleatorias vazia /recommendatios/random, esperando return 404", async () => {
+        const result = await supertest(app).get(`/recommendations/random`);
+        const status = result.status;
+
+        expect(status).toEqual(404);
+    });
+
+    it("Buscando as melhores musicas /recommendations/top/:amount, esperado return 200",async () =>{
+        await prisma.recommendation.createMany({data:seed})
+        const number = Math.floor(Math.random() * 100 + 1)
+        const result = await supertest(app).get(`/recommendations/top/${number}`);
+        const status = result.status;
+
+        expect(status).toEqual(200)
+    })
+
+    it("Buscando as melhores musicas (lista vazia) /recommendations/top/:amount, esperado return 200",async () =>{
+        const number = Math.floor(Math.random() * 100 + 1)
+        const result = await supertest(app).get(`/recommendations/top/${number}`);
+        const status = result.status;
+
+        expect(status).toEqual(200)
+    })
+
+    it("Buscando as melhores musicas (amount invalido) /recommendations/top/:amount, esperado return 200",async () =>{
+        await prisma.recommendation.createMany({data:seed})
+        const result = await supertest(app).get(`/recommendations/top/0`);
+        const status = result.status;
+
+        expect(status).toEqual(200)
+    })
 })
 
 afterAll(async () => {
