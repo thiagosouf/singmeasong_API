@@ -1,6 +1,6 @@
-import app from '../src/app.js';
+import app from '../../src/app.js';
 import supertest from 'supertest';
-import { prisma } from "./../src/database.js"
+import { prisma } from "../../src/database.js"
 
 
 const _BODY = {
@@ -9,7 +9,7 @@ const _BODY = {
 };
 
 beforeEach(async () => {
-    await prisma.$executeRaw`DELETE FROM recommendations WHERE name = 'Falamansa - Xote dos Milagres'`;
+    await prisma.$executeRaw`DELETE FROM recommendations`;
 })
 
 describe("POST /recommendations", () => {

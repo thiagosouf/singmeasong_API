@@ -1,4 +1,4 @@
-import { Recommendation } from "@prisma/client";
+import { Recommendation } from "@prisma/client"; 
 import { recommendationRepository } from "../repositories/recommendationRepository.js";
 import { conflictError, notFoundError } from "../utils/errorUtils.js";
 
@@ -90,4 +90,8 @@ export const recommendationService = {
   get,
   getById: getByIdOrFail,
   getTop,
+  getByScore,
+  getScoreFilter
 };
+
+

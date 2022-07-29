@@ -1,6 +1,6 @@
-import app from '../src/app.js';
+import app from '../../src/app.js';
 import supertest from 'supertest';
-import { prisma } from "./../src/database.js"
+import { prisma } from "../../src/database.js"
 
 const seed = [
         {name:"Falamansa - Rindo a Toa",youtubeLink:"https://www.youtube.com/watch?v=iuwAZ-x1sAo"},
@@ -49,6 +49,7 @@ describe("GET /recommendations", () => {
     });
 
     it("Buscando recomendações aleatorias vazia /recommendatios/random, esperando return 404", async () => {
+        await prisma.$executeRaw`DELETE FROM recommendations`;
         const result = await supertest(app).get(`/recommendations/random`);
         const status = result.status;
 
