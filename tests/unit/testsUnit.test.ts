@@ -5,13 +5,29 @@ import { recommendationVideoFactory, recommendationResponseFactory } from '../fa
 
 
 
-describe('Recommendation service unit tests', () => {
+describe('Testes Unit recomendacao', () => {
 	beforeEach(() => {
 		jest.clearAllMocks()
 		jest.resetAllMocks()
 	})
 
-	it('should return conflict error and not create recommendation given duplicated recommendation', () => {
+	it('criando recomendacao', async () => {
+		const recommendation = recommendationVideoFactory()
+
+		jest
+			.spyOn(recommendationRepository, 'findByName')
+			.mockImplementationOnce((): any => {})
+
+		jest
+			.spyOn(recommendationRepository, 'create')
+			.mockImplementationOnce(():any => {})
+
+			await recommendationService.insert(recommendation)
+
+		expect(recommendationRepository.create).toBeCalled()
+	})
+
+	it('criando recomendacao duplicada', () => {
 		const recommendation = recommendationVideoFactory()
 		const recommendationResponse = recommendationResponseFactory(36)
 
@@ -31,7 +47,7 @@ describe('Recommendation service unit tests', () => {
 		expect(create).not.toBeCalled()
 	})
 
-	it('should remove recommendation if their score is less than -5', async () => {
+	it('removendo vote menor que -5', async () => {
 		const recommendationResponse = recommendationResponseFactory(-5)
 
 		jest
@@ -52,7 +68,25 @@ describe('Recommendation service unit tests', () => {
 		expect(removeRecommendation).toBeCalledTimes(1)
 	})
 
-	it('should return not found error giving an inexistent id', () => {
+	it('upvote na recomendacao', async () =>{
+		const recommendation = recommendationVideoFactory()
+		const recommendationResponse = recommendationResponseFactory(1)
+
+		jest
+			.spyOn(recommendationRepository, 'find')
+			.mockImplementationOnce(():any => recommendationResponse)
+
+		jest
+			.spyOn(recommendationRepository, 'updateScore')
+			.mockResolvedValue(null)
+
+		await recommendationService.upvote(recommendationResponse.id)
+
+		expect(recommendationRepository.find).toBeCalled()
+    	expect(recommendationRepository.updateScore).toBeCalled()
+	})
+
+	it('Erro Id nao encontrado', () => {
 		jest.spyOn(recommendationRepository, 'find').mockResolvedValue(null)
 
 		expect(async () => {
@@ -60,19 +94,43 @@ describe('Recommendation service unit tests', () => {
 		}).rejects.toEqual({ type: 'not_found', message: '' })
 	})
 
-	it('should return not found error if there is no recommendations', async () => {
-		jest.spyOn(recommendationRepository, 'findAll').mockResolvedValue([])
+	it('Encontrar todas as recomendacoes', async ()=>{
+		jest
+		.spyOn(recommendationRepository, 'findAll')
+		.mockImplementationOnce((): any => { })
+
+		await recommendationService.get()
+
+		expect(recommendationRepository.findAll).toBeCalled()
+	})
+
+	it('Erro não existe recomendacao', async () => {
+		jest
+			.spyOn(recommendationRepository, 'findAll')
+			.mockResolvedValue([])
 
 		expect(async () => {
 			await recommendationService.getRandom()
 		}).rejects.toEqual({ type: 'not_found', message: '' })
 	})
 
-	it("should return 'lte' if number is greater than 0.7", () => {
+	it('Buscar os top das recomendacoes', async () => {
+		const amount = 10
+	
+		jest
+			.spyOn(recommendationRepository, 'getAmountByScore')
+		  	.mockImplementationOnce((): any => { })
+	
+		await recommendationService.getTop(amount)
+	
+		expect(recommendationRepository.getAmountByScore).toBeCalled()
+	  })
+
+	it("Retornar o 'lte' dos 0.7 do random", () => {
 		expect(recommendationService.getScoreFilter(0.7)).toEqual('lte')
 	})
 
-	it('should return recommendation if length is greater than 0', async () => {
+	it("Retornar o 'gt' dos 0.3 do random", async () => {
 		const recommendationResponse = recommendationResponseFactory(5)
 
 		jest
